@@ -22,6 +22,7 @@ namespace GraviRayTraceSharp.Helpers
         {
 
             int c = _baseReader.Read();
+            _position += _baseReader.CurrentEncoding.GetByteCount("" + (char)c);
             return c;
         }
 
