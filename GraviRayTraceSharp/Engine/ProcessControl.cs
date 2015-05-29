@@ -65,15 +65,17 @@ namespace GraviRayTraceSharp.Engine
                 if (fileReader != null)
                 {
                     int? frameNo = null;
+                    var position = 0;
                     do
                     {
+                        position = fileReader.Position;
                         var line = fileReader.ReadLine();
                         var tokens = line.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                         if (tokens.Length == 2)
                         {
                             if (tokens[1] == "1") // found unrendered frame no
                             {
-                                fileReader.BaseStream.Seek(fileReader.Position, SeekOrigin.Begin); // move the stream pointer back
+                                fileReader.BaseStream.Seek(position + fileReader.CurrentEncoding.GetByteCount(line) + 2, SeekOrigin.Begin); // move the stream pointer back
                                 byte[] tokenChar = UTF8Encoding.UTF8.GetBytes("2");
                                 fileReader.BaseStream.Write(tokenChar, 0, tokenChar.Length);  // write the "reserved" status back in file.
 
@@ -105,13 +107,14 @@ namespace GraviRayTraceSharp.Engine
                     bool finished = false;
                     do
                     {
+                        var position = fileReader.Position;
                         var line = fileReader.ReadLine();
                         var tokens = line.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                         if (tokens.Length == 2)
                         {
                             if (tokens[0] == "" + frameNo) // found frame
                             {
-                                fileReader.BaseStream.Seek(fileReader.Position, SeekOrigin.Begin); // move the stream pointer back
+                                fileReader.BaseStream.Seek(position + fileReader.CurrentEncoding.GetByteCount(line) + 2, SeekOrigin.Begin); // move the stream pointer back
                                 byte[] tokenChar = UTF8Encoding.UTF8.GetBytes("3");
                                 fileReader.BaseStream.Write(tokenChar, 0, tokenChar.Length);  // write the "committed" status back in file.
                                 finished = true;
